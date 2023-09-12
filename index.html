@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cigarette Sales Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+<div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+    <h1 class="text-2xl font-semibold mb-4">Cigarette Sales Dashboard</h1>
+
+    <div class="mb-4">
+        <p>Current Cigarette Box: <span id="boxCount">1</span></p>
+        <p>Remaining Reams: <span id="reamCount">50</span></p>
+        <p>Remaining Packs: <span id="packCount">500</span></p>
+        <p>Total Sales (₱): <span id="totalSales">0</span></p>
+        <p>Total Profit (₱): <span id="totalProfit">0</span></p>
+    </div>
+
+    <button id="sellPack" class="bg-blue-500 text-white py-2 px-4 rounded-md">Sell 1 Pack</button>
+    <button id="generateReport" class="bg-green-500 text-white py-2 px-4 rounded-md">Generate Report</button>
+    
+    <div class="mt-4" id="reportTable"></div>
+    <button id="copyToClipboard" class="bg-blue-500 text-white py-2 px-4 rounded-md">Copy to Clipboard</button>
+</div>
+
+<script>
+    let boxCount = 1;
+    let reamCount = 50;
+    let packCount = 500;
+    let totalSales = 0;
+    let totalProfit = 0;
+
+    const sellPackButton = document.getElementById("sellPack");
+    const generateReportButton = document.getElementById("generateReport");
+    const copyToClipboardButton = document.getElementById("copyToClipboard");
+    const reportTable = document.getElementById("reportTable");
+    const boxCountElement = document.getElementById("boxCount");
+    const reamCountElement = document.getElementById("reamCount");
+    const packCountElement = document.getElementById("packCount");
+    const totalSalesElement = document.getElementById("totalSales");
+    const totalProfitElement = document.getElementById("totalProfit");
+
+    sellPackButton.addEventListener("click", () => {
+        if (packCount > 0) {
+            packCount--;
+            totalSales += 50;
+            totalProfit += 18; // Profit per pack
+            updateCounts();
+        }
+
+        if (packCount === 0) {
+            // Deduct a ream and reset pack count
+            reamCount--;
+            packCount = 10;
+            updateCounts();
+        }
+
+        if (packCount % 10 === 0) {
+            // Deduct a ream when 10 packs are sold
+            reamCount--;
+            updateCounts();
+        }
+
+        if (totalSales >= 16000) {
+            // Alert to buy a new box
+            alert("Time to buy a new box!");
+            boxCount++;
+            totalSales -= 16000;
+            reamCount += 18;
+            updateCounts();
+        }
+    });
+    generateReportButton.addEventListener("click", () => {
+        const currentDate = new Date().toLocaleDateString();
+        
+        // Generate the report as an HTML table
+        const reportHTML = `
+            <table border="1">
+                <tr>
+                    <th>Date</th>
+                    <th>Total Sales (₱)</th>
+                    <th>Total Profit (₱)</th>
+                    <th>Remaining Reams</th>
+                    <th>Remaining Packs</th>
+                </tr>
+                <tr>
+                    <td>${currentDate}</td>
+                    <td>${totalSales}</td>
+                    <td>${totalProfit}</td>
+                    <td>${reamCount}</td>
+                    <td>${packCount}</td>
+                </tr>
+            </table>
+        `;
+        
+        // Display the report in the reportTable div
+        reportTable.innerHTML = reportHTML;
+    });
+
+    copyToClipboardButton.addEventListener("click", () => {
+        const reportTableElement = document.querySelector("#reportTable table");
+        const reportText = reportTableElement.innerText;
+
+        // Copy the report text to the clipboard
+        const textarea = document.createElement("textarea");
+        textarea.value = reportText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+
+        alert("Report copied to clipboard!");
+    });
+
+    function updateCounts() {
+        boxCountElement.textContent = boxCount;
+        reamCountElement.textContent = reamCount;
+        packCountElement.textContent = packCount;
+        totalSalesElement.textContent = totalSales;
+        totalProfitElement.textContent = totalProfit;
+    }
+</script>
+
+</body>
+</html>
